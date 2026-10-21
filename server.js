@@ -289,7 +289,7 @@ app.post("/api/events", (req, res) => {
     });
 });
 
-// 4. UPDATE an event using PUT.
+// 4. UPDATE 
 app.put("/api/events/:id", (req, res) => {
     if (!validId(req.params.id)) {
         return res.status(400).json({
@@ -432,8 +432,8 @@ app.post("/api/attendance", (req, res) => {
     });
 });
 
-// 9. UPDATE an attendance record.
-app.patch("/api/attendance/:id", (req, res) => {
+// 9. UPDATE an attendance record using PUT.
+app.put("/api/attendance/:id", (req, res) => {
     if (!validId(req.params.id)) {
         return res.status(400).json({
             message: "Attendance ID must be a positive integer."
@@ -441,7 +441,10 @@ app.patch("/api/attendance/:id", (req, res) => {
     }
 
     const id = Number(req.params.id);
-    const record = attendance.find(item => item.id === id);
+
+    const record = attendance.find(
+        item => item.id === id
+    );
 
     if (!record) {
         return res.status(404).json({
@@ -449,31 +452,29 @@ app.patch("/api/attendance/:id", (req, res) => {
         });
     }
 
-    const error = validateAttendance(req.body);
+    // Validate all required attendance fields.
+    const error = validateAttendance(req.body, true);
 
     if (error) {
-        return res.status(400).json({ message: error });
+        return res.status(400).json({
+            message: error
+        });
     }
 
-    const candidate = { ...record, ...req.body };
-
-    if (duplicateAttendance(candidate, id)) {
+    // Prevent duplicate attendance for the same event and student.
+    if (duplicateAttendance(req.body, id)) {
         return res.status(409).json({
             message: "Attendance for this student and event already exists."
         });
     }
 
-    if (req.body.studentId !== undefined) {
-        req.body.studentId = req.body.studentId.trim();
-    }
+    // Replace the entire attendance record.
+    record.eventId = req.body.eventId;
+    record.studentId = req.body.studentId.trim();
+    record.studentName = req.body.studentName.trim();
+    record.status = req.body.status;
 
-    if (req.body.studentName !== undefined) {
-        req.body.studentName = req.body.studentName.trim();
-    }
-
-    Object.assign(record, req.body);
-
-    res.status(200).json({
+    return res.status(200).json({
         message: "Attendance updated successfully.",
         data: record
     });
