@@ -289,8 +289,8 @@ app.post("/api/events", (req, res) => {
     });
 });
 
-// 4. UPDATE an event.
-app.patch("/api/events/:id", (req, res) => {
+// 4. UPDATE an event using PUT.
+app.put("/api/events/:id", (req, res) => {
     if (!validId(req.params.id)) {
         return res.status(400).json({
             message: "Event ID must be a positive integer."
@@ -307,19 +307,19 @@ app.patch("/api/events/:id", (req, res) => {
         });
     }
 
-    const error = validateEvent(req.body);
+    const error = validateEvent(req.body, true);
 
     if (error) {
-        return res.status(400).json({ message: error });
+        return res.status(400).json({
+            message: error
+        });
     }
 
     for (const field of eventFields) {
-        if (req.body[field] !== undefined) {
-            event[field] = req.body[field].trim();
-        }
+        event[field] = req.body[field].trim();
     }
 
-    res.status(200).json({
+    return res.status(200).json({
         message: "Event updated successfully.",
         data: event
     });
