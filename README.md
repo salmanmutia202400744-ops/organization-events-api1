@@ -92,11 +92,11 @@ Include successful CRUD requests and invalid requests.
 
 ## GitHub Repository
 
-https://github.com/YOUR-USERNAME/organization-events-api
+https://github.com/salmanmutia202400744-ops/organization-events-api1
 
 ## Render Deployment
 
-https://YOUR-SERVICE-NAME.onrender.com
+https://organization-events-api1.onrender.com
 
 ## Limitations
 
